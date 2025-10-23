@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" id="html" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>apps.html</title>
+    <link rel="stylesheet" href="Style.css" />
+  
+</head>
+
+<body>
+    <div class="container">
+        <section style=" background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            
+            
+            
+            
+            ">
+    <main class="main-content">
+        <h2 class="apph2">تفاصيل التطبيق المدخل</h2>
+        
+        <table>
+            <tr>
+                <th>اسم التطبيق</th>
+                <th>اسم الشركة المطورة</th>
+                <th>مجال الاستخدام</th>
+                <th>مجاني\غير مجاني</th>
+                <th>المزيد من التفاصيل</th>
+            </tr>
+
+            <tbody id="appsTableBody">
+                <!-- صفوف التطبيقات ستُملأ هنا ديناميكياً -->
+            </tbody>
+
+        </table>
+
+        <!-- أزرار تحت الجدول -->
+        <div style="text-align:center; margin-top:16px; display:flex; gap:12px; justify-content:center;">
+            <a href="add_app.html" class="more-btn" style="text-decoration:none; padding:10px 16px; font-weight:600;">
+                اضف تطبيقا
+            </a>
+            <button id="resetDefaultsBtn" class="more-btn" style="background:#dc3545;">اعادة للافتراضي</button>
+        </div>
+        <a href="home.html" class="project-link" style="width:max-content;">الصفحة الرئيسية</a>
+
+        </section>
+</div>
+        <script>
+            // قائمة التطبيقات الافتراضية
+            const defaultApps = [{
+                appName: "ChatGPT",
+                company: "OpenAI",
+                category: "محادثة وتوليد نصوص",
+                isFree: "مجاني / اشتراك مدفوع (ChatGPT Plus)",
+                description: "نموذج محادثة قوي لتوليد نصوص، مساعدة في الكتابة، البرمجة، والأسئلة العامة.",
+                website: "https://chat.openai.com",
+                logo: "chatgbt.png"
+            }, {
+                appName: "Bard",
+                company: "Google",
+                category: "محادثة ومساعد ذكي",
+                isFree: "مجاني",
+                description: "مساعد محادثة من جوجل يقدّم إجابات، ملخصات وروابط مفيدة للبحث.",
+                website: "https://bard.google.com",
+                logo: "bard.png"
+            }, {
+                appName: "Claude",
+                company: "Anthropic",
+                category: "محادثة وتوليد نصوص مع اهتمام بالسلامة",
+                isFree: "نسخة مجانية / خطط مدفوعة",
+                description: "نموذج محادثة من Anthropic يركّز على الاستخدام الآمن والموجه للمؤسسات.",
+                website: "https://www.anthropic.com",
+                logo: "claud.png"
+            }, {
+                appName: "Midjourney",
+                company: "Midjourney, Inc.",
+                category: "توليد صور بالذكاء الاصطناعي",
+                isFree: "مدفوع (اشتراك)",
+                description: "خدمة توليد صور عالية الجودة عبر أوصاف نصية تعمل عادة عبر ديسكورد.",
+                website: "https://www.midjourney.com",
+                logo: "midjourney.png"
+            }, {
+                appName: "DALL·E",
+                company: "OpenAI",
+                category: "توليد صور من نص",
+                isFree: "مجاني جزئياً / أرصدة مدفوعة",
+                description: "نموذج من OpenAI لتوليد صور مفصّلة من أوصاف نصية مع تحكم بالأنماط.",
+                website: "https://openai.com/dall-e-2",
+                logo: "dalle.jpg"
+            }];
+
+            // جلب القائمة من التخزين أو إنشاء الافتراضي
+            function getAppsList() {
+                const raw = localStorage.getItem('appsList');
+                if (!raw) {
+                    localStorage.setItem('appsList', JSON.stringify(defaultApps));
+                    return defaultApps.slice();
+                }
+                try {
+                    return JSON.parse(raw);
+                } catch (e) {
+                    localStorage.setItem('appsList', JSON.stringify(defaultApps));
+                    return defaultApps.slice();
+                }
+            }
+
+            // رسم صفوف الجدول من القائمة
+            function renderAppsTable() {
+                const list = getAppsList();
+                const tbody = document.getElementById('appsTableBody');
+                tbody.innerHTML = '';
+                list.forEach(app => {
+                    const imgSrc = app.logo ? app.logo : 'https://via.placeholder.com/80';
+                    const youtubeQuery = encodeURIComponent('how to use ' + app.appName);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${app.appName}</td>
+                    <td>${app.company}</td>
+                    <td>${app.category}</td>
+                    <td>${app.isFree}</td>
+                    <td>
+                        <details>
+                            <summary class="more-btn">المزيد</summary>
+                            <div class="more-content" dir="rtl">
+                                <img src="${imgSrc}" alt="شعار ${app.appName}">
+                                <strong>${app.appName}</strong>
+                                <p>${app.description || ''}</p>
+                                <p>
+                                    <a href="${app.website || '#'}" target="_blank" rel="noopener">الموقع الرسمي</a> |
+                                    <a href="https://www.youtube.com/results?search_query=${youtubeQuery}" target="_blank" rel="noopener">فيديو تعليمي على يوتيوب</a>
+                                </p>
+                            </div>
+                        </details>
+                    </td>
+                `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            // إعادة للافتراضي: تعيد appsList إلى defaultApps (تمسح إضافات المستخدم)
+            function resetToDefaults() {
+                if (!confirm('هل تريد إعادة التطبيقات إلى الحالة الافتراضية؟ سيتم حذف التطبيقات التي أضفتها.')) return;
+                localStorage.setItem('appsList', JSON.stringify(defaultApps));
+                // إزالة أي appData مفرد مخزن سابقاً
+                localStorage.removeItem('appData');
+                renderAppsTable();
+            }
+
+            document.getElementById('resetDefaultsBtn').addEventListener('click', resetToDefaults);
+
+            // عند تحميل الصفحة: عرض الجدول
+            window.addEventListener('DOMContentLoaded', () => {
+                renderAppsTable();
+            });
+            
+        </script>
+        
+    </main>
+</body>
+
+</html>
