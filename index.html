@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>add_app</title>
+  <!-- <link rel="stylesheet" href="Style.css" /> -->
+</head>
+<style> 
+:root {
+            --primary: #007bff;
+            --bg:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+             line-height: 1.6;
+              min-height: 100vh;
+            --card: #ffffff;
+            --muted: #6b7280;
+        }
+        
+        body {
+            font-family:  Cairo, Tahoma, Arial, sans-serif;
+            background: var(--bg);
+            color: #111;
+            margin: 0;
+            padding: 20px;
+            direction: rtl
+        }
+        
+        .container {
+            max-width: 760px;
+            margin: 20px auto;
+            background: var(--card);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06)
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin: 0 0 12px
+        }
+        
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 600
+        }
+        
+        .note {
+            font-size: 0.95em;
+            color: var(--muted);
+            margin-top: 6px
+        }
+        
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-top: 6px;
+            font-size: 1rem;
+            box-sizing: border-box
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical
+        }
+        
+        .row {
+            display: flex;
+            gap: 12px
+        }
+        
+        .row .col {
+            flex: 1
+        }
+        
+        .actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-family:  Cairo, Tahoma, Arial, sans-serif;
+            text-decoration: none
+        }
+        
+        .btn.secondary {
+            background: #eee;
+            color: #222
+            
+        }
+        
+        .error {
+            background: #ffe6e6;
+            color: #a00;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 12px;
+            display: none
+        }
+        
+        .success {
+            background: #e6ffef;
+            color: #066;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 12px;
+            display: none
+        }
+        
+        .small {
+            font-size: 0.9em;
+            color: var(--muted)
+        }
+    </style>
+<body>
+    <div class="container" dir="rtl">
+        <h1>إضافة تطبيق جديد</h1>
+        <p class="small">يرجى إدخال بيانات التطبيق ثم الضغط على "إرسال".</p>
+
+        <form id="addAppForm" novalidate>
+            <label for="appName">اسم التطبيق
+                <span class="note">ملاحظة: أحرف هجائية فقط باللغة الإنكليزية بدون فراغات </span>
+            </label>
+            <input type="text" id="appName" name="appName" placeholder="مثال: ChatGPT" required>
+
+            <label for="company">اسم الشركة المصنعة
+                <span class="note">نفس الملاحظة: أحرف إنكليزية فقط بدون فراغات</span>
+            </label>
+            <input type="text" id="company" name="company" placeholder="مثال: OpenAI" required>
+
+            <label for="website">الموقع الإلكتروني
+                <span class="note">ملاحظة: أحرف إنكليزية فقط بدون فراغات</span>
+            </label>
+            <input type="text" id="website" name="website" placeholder="مثال: openai" required>
+
+            <div class="row">
+                <div class="col">
+                    <label for="isFree">هل التطبيق مجاني؟</label>
+                    <select id="isFree" name="isFree">
+                        <option value="نعم">نعم</option>
+                        <option value="لا">لا</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="category">مجال الاستخدام</label>
+                    <input type="text" id="category" name="category" placeholder="مثال: محادثة وتوليد نصوص" required>
+                </div>
+            </div>
+
+            <label for="description">شرح بسيط عن التطبيق</label>
+            <textarea id="description" name="description" placeholder="اكتب وصفاً موجزاً عن التطبيق" required></textarea>
+
+            <div class="error" id="errorBox"></div>
+            <div class="success" id="successBox">تمت الإضافة بنجاح. سيتم إعادة التوجيه إلى صفحة التطبيقات...</div>
+
+            <div class="actions">
+                <a href="apps.html" class="btn secondary">إلغاء</a>
+                <button type="button" id="resetBtn" class="btn secondary" style="background:#ff0707;color:#ffffff;">اعادة للافتراضي</button>
+                <button type="submit" class="btn">إرسال</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // نسخة من التطبيقات الافتراضية (مطابقة لما في apps.html)
+        const defaultApps = [
+            { appName: "ChatGPT", company: "OpenAI", category: "محادثة وتوليد نصوص", isFree: "مجاني / اشتراك مدفوع (ChatGPT Plus)", description: "نموذج محادثة قوي لتوليد نصوص، مساعدة في الكتابة، البرمجة، والأسئلة العامة.", website: "https://chat.openai.com", logo: "chatgbt.png" },
+            { appName: "Bard", company: "Google", category: "محادثة ومساعد ذكي", isFree: "مجاني", description: "مساعد محادثة من جوجل يقدّم إجابات، ملخصات وروابط مفيدة للبحث.", website: "https://bard.google.com", logo: "bard.png" },
+            { appName: "Claude", company: "Anthropic", category: "محادثة وتوليد نصوص مع اهتمام بالسلامة", isFree: "نسخة مجانية / خطط مدفوعة", description: "نموذج محادثة من Anthropic يركّز على الاستخدام الآمن والموجه للمؤسسات.", website: "https://www.anthropic.com", logo: "claud.png" },
+            { appName: "Midjourney", company: "Midjourney, Inc.", category: "توليد صور بالذكاء الاصطناعي", isFree: "مدفوع (اشتراك)", description: "خدمة توليد صور عالية الجودة عبر أوصاف نصية تعمل عادة عبر ديسكورد.", website: "https://www.midjourney.com", logo: "midjourney.png" },
+            { appName: "DALL·E", company: "OpenAI", category: "توليد صور من نص", isFree: "مجاني جزئياً / أرصدة مدفوعة", description: "نموذج من OpenAI لتوليد صور مفصّلة من أوصاف نصية مع تحكم بالأنماط.", website: "https://openai.com/dall-e-2", logo: "dalle.jpg" }
+        ];
+
+        // قواعد: أحرف إنكليزية فقط بدون فراغات
+        const lettersOnly = /^[A-Za-z]+$/;
+
+        const form = document.getElementById('addAppForm');
+        const errorBox = document.getElementById('errorBox');
+        const successBox = document.getElementById('successBox');
+        const resetBtn = document.getElementById('resetBtn');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            errorBox.style.display = 'none';
+            successBox.style.display = 'none';
+
+            const appName = document.getElementById('appName').value.trim();
+            const company = document.getElementById('company').value.trim();
+            const website = document.getElementById('website').value.trim();
+            const isFree = document.getElementById('isFree').value;
+            const category = document.getElementById('category').value.trim();
+            const description = document.getElementById('description').value.trim();
+
+            const errors = [];
+
+            if (!lettersOnly.test(appName)) errors.push('اسم التطبيق غير صالح — يجب أن يحتوي على أحرف إنكليزية فقط وبدون فراغات.');
+            if (!lettersOnly.test(company)) errors.push('اسم الشركة غير صالح — أحرف إنكليزية فقط وبدون فراغات.');
+            if (!lettersOnly.test(website)) errors.push('الموقع الإلكتروني غير صالح حسب الملاحظة — أحرف إنكليزية فقط وبدون فراغات.');
+            if (!category) errors.push('يجب إدخال مجال الاستخدام.');
+            if (!description) errors.push('يجب إدخال شرح بسيط عن التطبيق.');
+
+            if (errors.length) {
+                errorBox.innerHTML = errors.join('<br>');
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            // بناء كائن التطبيق
+            const newApp = { appName, company, website, isFree, category, description };
+
+            // إضافة إلى مصفوفة appsList (تتم إضافة سطر جديد في apps.html عند العودة)
+            try {
+                const listRaw = localStorage.getItem('appsList');
+                const list = listRaw ? JSON.parse(listRaw) : defaultApps.slice();
+                list.push(newApp);
+                localStorage.setItem('appsList', JSON.stringify(list));
+                // احفظ أيضاً appData مفرد إن أردت توافقاً مع كود سابق
+                localStorage.setItem('appData', JSON.stringify(newApp));
+            } catch (err) { /* تجاهل خطأ التخزين */ }
+
+            successBox.style.display = 'block';
+
+            // إعادة التوجيه بعد تأخير بسيط لعرض رسالة النجاح
+            setTimeout(() => {
+                window.location.href = 'apps.html';
+            }, 900);
+        });
+
+        // زر إعادة للافتراضي في صفحة الإضافة
+        resetBtn.addEventListener('click', function() {
+            if (!confirm('هل تريد إعادة التطبيقات إلى الحالة الافتراضية؟ سيتم حذف التطبيقات التي أضفتها.')) return;
+            localStorage.setItem('appsList', JSON.stringify(defaultApps));
+            localStorage.removeItem('appData');
+            alert('تمت إعادة التطبيقات إلى الافتراضي.');
+        });
+    </script>
+</body>
+
+</html>
